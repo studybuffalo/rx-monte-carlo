@@ -406,7 +406,7 @@ shift_acute_care = Shift(
 # - Make sure to include your variable in the scenarios package's "scenario"
 #   variable (found in the __init__.py file); if you don't do this, your 
 #   scenario will not be included in the Monte Carlo simulation.
-current_state = ScenarioDetails(
+scenario = ScenarioDetails(
     name='Current State',
     fte=fte,
     staff=staff,
