@@ -12,12 +12,12 @@ from .utils import ScenarioDetails, Event, Shift, cycle_length
 #   their stated FTE/availablility
 fte = {
     'official': {
-        'regular': 33.7, # Based on position FTE
+        'regular': 35.7, # Based on position FTE + 2 FTE
         'bece': 2.4, # Based on minimum FTE requirements
         'casual': 1.4, # Based on stated availability
     },
     'actual': {
-        'regular': 34.5748,
+        'regular': 36.5748, # + 2 FTE
         'bece': 3.2551,
         'casual': 1.5102,
 
@@ -428,7 +428,7 @@ shift_acute_care_secondary = Shift(
 # - Make sure to include your variable in the scenarios package's "scenario"
 #   variable (found in the __init__.py file); if you don't do this, your 
 #   scenario will not be included in the Monte Carlo simulation.
-combined_teams = ScenarioDetails(
+scenario = ScenarioDetails(
     name='Combined Teams',
     fte=fte,
     staff=staff,
