@@ -1,5 +1,8 @@
 """Runs the simulations."""
+import time
+
 import numpy as np
+from openpyxl import Workbook
 
 from scenarios import scenarios, cycle_length, Stats
 
@@ -121,15 +124,20 @@ print('Created by Joshua Torrance. 2024.')
 print('\nRunning simulations for each scenario.')
 print(f'  - Number of Simulations per Scenario: {num_simulations}')
 print(f'  - Length of Each Simulation: {cycle_length} weeks')
+print('\n------------------------------------------------------------------------')
+print('SCENARIOS')
+print('------------------------------------------------------------------------')
+
+# Variables to manage output workbook details
+output_wb = Workbook()
+output_ws = output_wb.active
+num_scenarios = len(scenarios)
 
 for scenario in scenarios:
-    print('\n------------------------------------------------------------------------')
-    print(f'SCENARIO: {scenario}')
-    print('------------------------------------------------------------------------')
-    print(f'Events in scenario: {", ".join([event.name for event in scenario.events])}')
-    print(f'Shifts in scenario: {", ".join([shift.name for shift in scenario.shifts])}')
-    print(f'Number of Shifts to Cover in Scenario: {sum([shift.number for shift in scenario.shifts])}')
-    print(f'Shift Capacity in Scenario: {scenario.fte.actual.total * 5}')
+    print(f'  - {scenario.name}')
+
+    # Set Worksheet Title
+    output_ws.title = scenario.name
 
     # Run simulations function and collect results in array
     scenario_results = []
@@ -233,7 +241,6 @@ for scenario in scenarios:
         simulation_shift_changes['week_total'].append(cycle_results['shift_changes']['change_total'])
 
     # Iterate through the lists of simulation event results to run calculations
-    print('\nEVENT OCCURRENCE STATS FOR CYCLE')
     simulations_stats = {
         'events': {},
         'uncovered_shifts': {},
@@ -254,41 +261,25 @@ for scenario in scenarios:
             'stats_total': stats_total,
         }
 
-        print(f'\nStats for {name}')
-        print(f'Events from 0 to 2 weeks:  {stats_0}')
-        print(f'Events from 2 to 4 weeks:  {stats_2}')
-        print(f'Events from 4 to 12 weeks: {stats_4}')
-        print(f'Events from 12+ weeks:     {stats_12}')
-        print(f'Events at all times:       {stats_total}')
-
     # Shift Coverage Stats
-    print('\nSHIFT COVERAGE STATS FOR CYCLE')
-
     for name, values in simulation_coverage_results.items():
         uncovered_shift_stats = Stats(values)
 
         simulations_stats['uncovered_shifts'][name] = uncovered_shift_stats
-
-        print(f'\nStats for {name}')
-        print(f'Number of Uncovered Shifts: {uncovered_shift_stats}')
         
     # Excess shift capacity stats
-    print('\nEXCESS SHIFT CAPACITY FOR CYCLE')
-
     excess_shifts_stats = Stats(simulation_excess_shifts)
 
-    print(f'Excess shifts for cycle: {excess_shifts_stats}')
-
     # Number of shift changes for cycle
-    print('\nSHIFT CHANGE STATS FOR CYCLE')
     shift_changes_stats_0 = Stats(simulation_shift_changes['week_0'])
     shift_changes_stats_2 = Stats(simulation_shift_changes['week_2'])
     shift_changes_stats_4 = Stats(simulation_shift_changes['week_4'])
     shift_changes_stats_12 = Stats(simulation_shift_changes['week_12'])
     shift_changes_stats_total = Stats(simulation_shift_changes['week_total'])
 
-    print(f'Shift changes from 0 to 2 weeks:  {shift_changes_stats_0}')
-    print(f'Shift changes from 2 to 4 weeks:  {shift_changes_stats_2}')
-    print(f'Shift changes from 4 to 12 weeks: {shift_changes_stats_4}')
-    print(f'Shift changes from 12+ weeks:     {shift_changes_stats_12}')
-    print(f'Shift changes at all times:       {shift_changes_stats_total}')
+    # Create a new worksheet if necessary
+    if len(output_wb.worksheets) < num_simulations:
+        output_ws = output_wb.create_sheet()
+
+# Save the workbook results
+output_wb.save(f'simulation_results_{int(time.time())}.xlsx')
