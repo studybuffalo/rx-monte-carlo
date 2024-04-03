@@ -33,6 +33,7 @@ class Event:
         self.rate_2 = r2
         self.rate_4 = r4
         self.rate_12 = r12
+        self.rate_total = r0 + r2 + r4 + r12
         self.cycle_max = cycle_max
 
     def __str__(self):
@@ -119,10 +120,10 @@ class Stats:
     """Calculates and outputs statistical calculations for results."""
     def __init__(self, values):
         self.values = np.array(values)
-        self.mean = np.mean(self.values)
+        self.mean = np.round(np.mean(self.values), 0)
         ci_lower, ci_upper = np.percentile(self.values, [2.5, 97.5])
-        self.ci_lower = ci_lower
-        self.ci_upper = ci_upper
+        self.ci_lower = np.round(ci_lower, 1)
+        self.ci_upper = np.round(ci_upper, 1)
 
     def __str__(self):
         """String representation of Stats."""
