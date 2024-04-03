@@ -315,11 +315,11 @@ for scenario in scenarios:
         output_ws.cell(row=row_num, column=1, value=event.name)
         output_ws.cell(row=row_num, column=2, value=event.changes)
         output_ws.cell(row=row_num, column=3, value=event.losses)
-        output_ws.cell(row=row_num, column=4, value=np.round(event.rate_total, 2))
-        output_ws.cell(row=row_num, column=5, value=np.round(event.rate_0, 2))
-        output_ws.cell(row=row_num, column=6, value=np.round(event.rate_2, 2))
-        output_ws.cell(row=row_num, column=7, value=np.round(event.rate_4, 2))
-        output_ws.cell(row=row_num, column=8, value=np.round(event.rate_12, 2))
+        output_ws.cell(row=row_num, column=4, value=np.round(event.rate_total, 4))
+        output_ws.cell(row=row_num, column=5, value=np.round(event.rate_0, 4))
+        output_ws.cell(row=row_num, column=6, value=np.round(event.rate_2, 4))
+        output_ws.cell(row=row_num, column=7, value=np.round(event.rate_4, 4))
+        output_ws.cell(row=row_num, column=8, value=np.round(event.rate_12, 4))
         output_ws.cell(row=row_num, column=9, value=event.cycle_max)
         row_num +=1
 
