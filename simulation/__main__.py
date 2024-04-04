@@ -34,6 +34,7 @@ def simulate_period(weeks, scenario):
     # Dictionary to hold all results for shift evaluations
     uncovered_shifts = {}
     excess_shifts = 0
+    actual_fte = []
 
     for shift in scenario.shifts:
         uncovered_shifts[shift.name] = 0
@@ -94,6 +95,7 @@ def simulate_period(weeks, scenario):
         # The starting capacity will be the normal weekly capacity minus the
         # week event total.
         remaining_capacity = shift_capacity - week_shift_losses
+        actual_fte.append(remaining_capacity / 5)
 
         # Iterate through each shift and start assigning remaining capacity
         for shift in scenario.shifts:
@@ -110,7 +112,8 @@ def simulate_period(weeks, scenario):
     return {
         'events': event_results,
         'uncovered_shifts': uncovered_shifts,
-        'remaining_capacity': excess_shifts,
+        'excess_shifts': excess_shifts,
+        'actual_fte': np.mean(actual_fte),
         'shift_changes': total_shift_changes,
     }
 
@@ -178,6 +181,9 @@ for scenario in scenarios:
     # Holds the count for number of excess shifts
     simulation_excess_shifts = []
 
+    # Holds the actual FTE amounts
+    simulation_actual_fte = []
+
     # Holds the number of shift changes
     simulation_shift_changes = {
         'week_0': [],
@@ -232,7 +238,10 @@ for scenario in scenarios:
         simulation_coverage_results['All Shifts'].append(all_uncovered_shifts)
 
         # Add the excess shifts results
-        simulation_excess_shifts.append(cycle_results['remaining_capacity'])
+        simulation_excess_shifts.append(cycle_results['excess_shifts'])
+
+        # Add the actual FTE results
+        simulation_actual_fte.append(cycle_results['actual_fte'])
 
         # Add the shift changes results
         simulation_shift_changes['week_0'].append(cycle_results['shift_changes']['change_0'])
@@ -270,6 +279,9 @@ for scenario in scenarios:
         
     # Excess shift capacity stats
     excess_shifts_stats = Stats(simulation_excess_shifts)
+
+    # Actual FTE stats
+    actual_fte_stats = Stats(simulation_actual_fte)
 
     # Number of shift changes for cycle
     shift_changes_stats_0 = Stats(simulation_shift_changes['week_0'])
@@ -418,6 +430,21 @@ for scenario in scenarios:
     output_ws.cell(row=row_num, column=2, value=excess_shifts_stats.mean)
     output_ws.cell(row=row_num, column=3, value=excess_shifts_stats.ci_lower)
     output_ws.cell(row=row_num, column=4, value=excess_shifts_stats.ci_upper)
+    row_num += 2
+
+    # Actual FTE Results
+    output_ws.cell(row=row_num, column=1, value='ACTUAL FTE RESULTS')
+    row_num += 1
+    
+    output_ws.cell(row=row_num, column=2, value='Mean Actual Worked FTE per Cycle')
+    output_ws.cell(row=row_num, column=3, value='Lower CI')
+    output_ws.cell(row=row_num, column=4, value='Upper CI')
+    row_num += 1
+    
+    output_ws.cell(row=row_num, column=1, value='Actual Worked FTE')
+    output_ws.cell(row=row_num, column=2, value=actual_fte_stats.mean)
+    output_ws.cell(row=row_num, column=3, value=actual_fte_stats.ci_lower)
+    output_ws.cell(row=row_num, column=4, value=actual_fte_stats.ci_upper)
     row_num += 2
 
     # Number of Shift Changes
